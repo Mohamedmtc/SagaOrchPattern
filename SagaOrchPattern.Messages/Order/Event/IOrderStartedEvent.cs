@@ -13,5 +13,6 @@ namespace SagaOrchPattern.Messages.Order.Event
         public string PaymentCardNumber { get; set; }
 
         public string ProductName { get; set; }
+        public bool IsCanceled { get; set; }
     }
 }

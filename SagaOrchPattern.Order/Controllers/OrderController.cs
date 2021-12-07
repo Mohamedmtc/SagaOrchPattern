@@ -34,7 +34,7 @@ namespace SagaOrchPattern.Order.Controllers
                 ,
                 ProductName = orderModel.ProductName
                 ,
-                Cancel = false
+                IsCanceled = orderModel.IsCanceled
             });
 
 

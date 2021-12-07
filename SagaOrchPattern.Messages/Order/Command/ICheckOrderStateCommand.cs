@@ -8,10 +8,12 @@ namespace SagaOrchPattern.Messages.Order.Command
 {
     public interface ICheckOrderStateCommand
     {
-        public Guid OrderId { get; set; }
+        public Guid OrderId { get; }
 
-        public string PaymentCardNumber { get; set; }
+        public string PaymentCardNumber { get;}
 
-        public string ProductName { get; set; }
+        public string ProductName { get;  }
+        public bool IsCanceled { get; }
+
     }
 }
