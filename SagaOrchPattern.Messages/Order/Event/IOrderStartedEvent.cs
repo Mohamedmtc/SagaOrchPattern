@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SagaOrchPattern.Messages.Order.Event
 {
-    public interface IOrderStartedEvent
+    public class IOrderStartedEvent
     {
         public Guid OrderId { get; set; }
 

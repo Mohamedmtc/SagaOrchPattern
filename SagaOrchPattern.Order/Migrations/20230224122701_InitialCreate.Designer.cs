@@ -10,8 +10,8 @@ using SagaOrchPattern.Order.Infra;
 namespace SagaOrchPattern.Order.Migrations
 {
     [DbContext(typeof(OrderDbContext))]
-    [Migration("20211206110019_firstmig")]
-    partial class firstmig
+    [Migration("20230224122701_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -39,6 +39,23 @@ namespace SagaOrchPattern.Order.Migrations
                     b.HasKey("OrderId");
 
                     b.ToTable("OrderPrices");
+                });
+
+            modelBuilder.Entity("SagaOrchPattern.Order.Models.OutBox", b =>
+                {
+                    b.Property<Guid>("OutBoxId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Event")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("OutBoxId");
+
+                    b.ToTable("OutBoxs");
                 });
 #pragma warning restore 612, 618
         }

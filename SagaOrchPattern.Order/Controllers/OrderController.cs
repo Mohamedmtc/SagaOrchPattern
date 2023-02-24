@@ -11,7 +11,7 @@ namespace SagaOrchPattern.Order.Controllers
     [Route("api/[controller]")]
     [ApiController]
     public class OrderController : ControllerBase
-    {        
+    {
         private readonly IOrderPriceDataAccess _orderDataAccess;
         private readonly IBus _bus;
 
@@ -22,22 +22,9 @@ namespace SagaOrchPattern.Order.Controllers
         }
         [HttpPost]
         [Route("createorder")]
-        public async Task<IActionResult> CreateOrder([FromBody] OrderPrice orderModel)
+        public IActionResult CreateOrder([FromBody] OrderPrice orderModel)
         {
             _orderDataAccess.SaveOrder(orderModel);
-
-            await _bus.Publish<IOrderStartedEvent>(new
-            {
-                OrderId = orderModel.OrderId
-                ,
-                PaymentCardNumber = orderModel.PaymentCardNumber
-                ,
-                ProductName = orderModel.ProductName
-                ,
-                IsCanceled = orderModel.IsCanceled
-            });
-
-
             return Ok("Success");
         }
     }

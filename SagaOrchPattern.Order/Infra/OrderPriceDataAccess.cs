@@ -1,4 +1,6 @@
-﻿using SagaOrchPattern.Order.Models;
+﻿using Newtonsoft.Json;
+using SagaOrchPattern.Messages.Order.Event;
+using SagaOrchPattern.Order.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +21,9 @@ namespace SagaOrchPattern.Order.Infra
             using (var context = new OrderDbContext())
             {
                 context.Add<OrderPrice>(order);
+                OutBox outBox=OutBox.CreateInstance<IOrderStartedEvent>(new { OrderId = order.OrderId, PaymentCardNumber = order.PaymentCardNumber, ProductName = order.ProductName, IsCanceled = order.IsCanceled });
+                var dd = outBox.ExchangeName;
+                context.Add<OutBox>(outBox);
                 context.SaveChanges();
             }
         }

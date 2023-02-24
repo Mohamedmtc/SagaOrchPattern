@@ -1,0 +1,8 @@
+﻿Add Migration
+=> dotnet ef migrations add InitialCreate
+
+Remove a migration
+=> dotnet ef migrations remove
+
+apply Migration
+=>dotnet ef database update

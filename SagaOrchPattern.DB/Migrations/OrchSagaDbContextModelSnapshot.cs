@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SagaOrchPattern.Order.Infra;
+using SagaOrchPattern.DB;
 
-namespace SagaOrchPattern.Order.Migrations
+namespace SagaOrchPattern.DB.Migrations
 {
-    [DbContext(typeof(OrderDbContext))]
-    partial class OrderDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(OrchSagaDbContext))]
+    partial class OrchSagaDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
@@ -19,10 +19,31 @@ namespace SagaOrchPattern.Order.Migrations
                 .HasAnnotation("ProductVersion", "5.0.11")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("SagaOrchPattern.Order.Models.OrderPrice", b =>
+            modelBuilder.Entity("SagaOrchPattern.DB.OrderStateData", b =>
                 {
-                    b.Property<Guid>("OrderId")
+                    b.Property<Guid>("CorrelationId")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CurrentState")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Exception")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsCanceled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("OrderCancelDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("OrderCreationDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("OrderFinishedDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("PaymentCardNumber")
@@ -31,29 +52,9 @@ namespace SagaOrchPattern.Order.Migrations
                     b.Property<string>("ProductName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("price")
-                        .HasColumnType("float");
+                    b.HasKey("CorrelationId");
 
-                    b.HasKey("OrderId");
-
-                    b.ToTable("OrderPrices");
-                });
-
-            modelBuilder.Entity("SagaOrchPattern.Order.Models.OutBox", b =>
-                {
-                    b.Property<Guid>("OutBoxId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Event")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Message")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("OutBoxId");
-
-                    b.ToTable("OutBoxs");
+                    b.ToTable("OrderStateData");
                 });
 #pragma warning restore 612, 618
         }

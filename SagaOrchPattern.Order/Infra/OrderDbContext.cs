@@ -12,6 +12,7 @@ namespace SagaOrchPattern.Order.Infra
     public class OrderDbContext : DbContext
     {
         public DbSet<OrderPrice> OrderPrices { get; set; }
+        public DbSet<OutBox> OutBoxs { get; set; }
 
         public OrderDbContext()
         {
@@ -23,7 +24,7 @@ namespace SagaOrchPattern.Order.Infra
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(@"Server=.; initial catalog=OrderpriceDb;integrated security=true;");
+            optionsBuilder.UseSqlServer(@"Server=.;initial catalog=OrderpriceDb;integrated security=true;");
         }
     }
 }

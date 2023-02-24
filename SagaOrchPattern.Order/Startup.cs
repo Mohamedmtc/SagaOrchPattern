@@ -39,7 +39,11 @@ namespace SagaOrchPattern.Order
 
             ////////////////////////////////// Database and Access layer //////////////////////
             services.AddDbContext<OrderDbContext> (o => o.UseSqlServer(Configuration.GetConnectionString("OrderingDatabase")));
+            services.AddScoped<OrderDbContext>();
             services.AddSingleton<IOrderPriceDataAccess, OrderPriceDataAccess>();
+            services.AddScoped<IOutBoxRepository, OutBoxRepository>();
+            services.AddSingleton<IntegrationEventSenderService>();
+            services.AddHostedService<IntegrationEventSenderService>(provider => provider.GetService<IntegrationEventSenderService>());
             ////////////////////////////////////////
 
             services.AddControllers();
