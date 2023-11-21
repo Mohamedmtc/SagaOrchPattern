@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,18 @@ namespace SagaOrchPattern.Orch
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                });
+                })
+             .UseSerilog((hostingContext, loggerConfiguration) => loggerConfiguration
+                 .ReadFrom.Configuration(hostingContext.Configuration)
+                 .WriteTo.OpenTelemetry(options =>
+                 {
+                     var configuration = hostingContext.Configuration;
+                     options.Endpoint = $"{configuration.GetValue<string>("Otlp:Endpoint")}/v1/logs";
+                     options.Protocol = Serilog.Sinks.OpenTelemetry.OtlpProtocol.Grpc;
+                     options.ResourceAttributes = new Dictionary<string, object>
+                     {
+                         ["service.name"] = configuration.GetValue<string>("Otlp:ServiceName")
+                     };
+                 }));
     }
 }

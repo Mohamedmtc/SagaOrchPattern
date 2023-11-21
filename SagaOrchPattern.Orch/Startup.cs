@@ -16,6 +16,9 @@ using MassTransit;
 using SagaOrchPattern.Core.RabbitMq.BusConfiguration;
 using SagaOrchPattern.Orch.StateMachine.Order;
 using MassTransit.EntityFrameworkCoreIntegration;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 namespace SagaOrchPattern.Orch
 {
     public class Startup
@@ -31,6 +34,30 @@ namespace SagaOrchPattern.Orch
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            Action<ResourceBuilder> appResourceBuilder =
+            resource => resource
+                .AddTelemetrySdk()
+                .AddService(
+                Configuration.GetValue<string>("Otlp:ServiceName"),
+                serviceVersion: "1.0.0",
+                serviceInstanceId: Environment.MachineName);
+
+            services.AddOpenTelemetry()
+                .ConfigureResource(appResourceBuilder)
+                .WithTracing(builder => builder
+                    .AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation()
+                    .AddSource("APITracing")
+                    //.AddSource(DiagnosticHeaders.DefaultListenerName)
+                    .AddConsoleExporter()
+                    .AddOtlpExporter(options => options.Endpoint = new Uri(Configuration.GetValue<string>("Otlp:Endpoint")))
+                )
+                .WithMetrics(builder => builder
+                    // .AddMeter(InstrumentationOptions.MeterName) // MassTransit Meter
+                    .AddRuntimeInstrumentation()
+                    .AddAspNetCoreInstrumentation()
+                    .AddOtlpExporter(options => options.Endpoint = new Uri(Configuration.GetValue<string>("Otlp:Endpoint"))));
+
             services.AddDbContext<OrchSagaDbContext>((provider, builder) =>
             {
                 builder.UseSqlServer(connectionString, m =>
