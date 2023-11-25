@@ -1,6 +1,7 @@
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using SagaOrchPattern.Messages.Order.Event;
+using System.Diagnostics;
 
 namespace OrderService.Controllers
 {
@@ -26,7 +27,9 @@ namespace OrderService.Controllers
         public IEnumerable<WeatherForecast> Get()
         {
             var id = Guid.NewGuid();
-            _logger.LogInformation($"Weather forecasts for {id}");
+            var traceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+            throw new Exception("atia error");
+            _logger.LogInformation($"TraceId: {traceId},Weather forecasts for {id}");
             _bus.Publish<IOrderStartedEvent>(new
             {
                 OrderId = id,

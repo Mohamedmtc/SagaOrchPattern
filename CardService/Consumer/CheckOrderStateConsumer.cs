@@ -39,7 +39,7 @@ namespace CardService.Consumer
                         context.Message.OrderId
                     });
                 }
-                throw new InvalidOperationException();
+             //   throw new InvalidOperationException();
             }
             catch (Exception ex)
             {
