@@ -18,7 +18,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddProblemDetails().AddExceptionHandler<GlobalExceptionHandler>();
-;
 
 #region MassTransit
 builder.Services.AddMassTransit(cfg =>

@@ -23,12 +23,12 @@ namespace OrderService.Controllers
             _bus = bus;
         }
 
-        [HttpGet(Name = "GetWeatherForecast")]
+        [HttpGet("GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
             var id = Guid.NewGuid();
             var traceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
-            throw new Exception("atia error");
+
             _logger.LogInformation($"TraceId: {traceId},Weather forecasts for {id}");
             _bus.Publish<IOrderStartedEvent>(new
             {
@@ -45,6 +45,15 @@ namespace OrderService.Controllers
                 Summary = id.ToString()
             })
             .ToArray();
+        }
+
+        [HttpGet("MakeException")]
+        public IEnumerable<WeatherForecast> MakeException()
+        {
+            var id = Guid.NewGuid();
+            var traceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+            throw new Exception("atia error");
+
         }
     }
 }
