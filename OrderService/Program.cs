@@ -16,7 +16,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Services.AddCors();
 builder.Services.AddProblemDetails().AddExceptionHandler<GlobalExceptionHandler>();
 
 #region MassTransit
@@ -46,9 +46,6 @@ builder.Host.UseSerilog((hostingContext, loggerConfiguration) => loggerConfigura
     }));
 #endregion
 
-
-
-
 #region Opentelemetry
 Action<ResourceBuilder> appResourceBuilder =
 resource => resource
@@ -74,6 +71,14 @@ builder.Services.AddOpenTelemetry()
 
 
 var app = builder.Build();
+
+app.UseCors(builder =>
+{
+    builder.AllowAnyOrigin()
+           .AllowAnyMethod()
+           .AllowAnyHeader();
+});
+
 app.UseStatusCodePages();
 app.UseExceptionHandler();
 app.UseMiddleware<TraceIdMiddleware>();

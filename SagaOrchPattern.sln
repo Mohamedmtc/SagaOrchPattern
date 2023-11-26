@@ -15,11 +15,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SagaOrchPattern.Core", "Sag
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SagaOrchPattern.Orch", "SagaOrchPattern.Orch\SagaOrchPattern.Orch.csproj", "{9B873E90-2A98-4AE8-9C07-8C33A34F247D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardService", "CardService\CardService.csproj", "{CF23440F-A0E4-4566-935B-E204FB40E3A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CardService", "CardService\CardService.csproj", "{CF23440F-A0E4-4566-935B-E204FB40E3A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService", "OrderService\OrderService.csproj", "{35176184-6846-4AE5-8CEE-0D6D67BF8ADE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrderService", "OrderService\OrderService.csproj", "{35176184-6846-4AE5-8CEE-0D6D67BF8ADE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orchestrator", "Orchestrator\Orchestrator.csproj", "{C057E32B-A8E3-40F4-89D9-EBC179A1393E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Orchestrator", "Orchestrator\Orchestrator.csproj", "{C057E32B-A8E3-40F4-89D9-EBC179A1393E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B8C975C6-6E94-4CE7-86F6-E5BFCD16005F}"
+	ProjectSection(SolutionItems) = preProject
+		StaticWeb\Index.html = StaticWeb\Index.html
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

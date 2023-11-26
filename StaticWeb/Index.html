@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OrderService Client</title>
+</head>
+<body>
+
+  <h1>OrderService Client</h1>
+
+  <button onclick="getWeatherForecast()">Get Weather Forecast</button>
+  <button onclick="makeException()">Make Exception</button>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    const apiBaseURL = 'https://localhost:7126'; // Replace with your actual API URL
+
+    function getWeatherForecast() {
+      const url = `${apiBaseURL}/WeatherForecast/GetWeatherForecast`;
+
+      axios.get(url)
+        .then(response => {
+          console.log('Weather Forecast:', response.data);
+          // Handle the response data as needed
+        })
+        .catch(error => {
+          console.error('Error getting weather forecast:', error);
+        });
+    }
+
+    function makeException() {
+      const url = `${apiBaseURL}/WeatherForecast/MakeException`;
+
+      axios.get(url)
+        .then(response => {
+          console.log('Exception Result:', response.data);
+          // Handle the response data as needed
+        })
+        .catch(error => {
+          console.error('Error making exception:', error);
+        });
+    }
+  </script>
+
+</body>
+</html>
