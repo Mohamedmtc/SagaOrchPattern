@@ -1,11 +1,18 @@
 using MassTransit.Logging;
 using MassTransit;
+using OpenTelemetry;
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Instrumentation.AspNetCore;
+using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
 using OrderService.RabbitMq.BusConfiguration;
 using OrderService;
+using System.Runtime.InteropServices;
+using System.Reflection.PortableExecutable;
+using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,33 +31,26 @@ builder.Services.AddMassTransit(cfg =>
 {
 
 
-cfg.AddBus(provider => RabbitMqBus.ConfigureBusWebApi(builder.Configuration, provider));
+    cfg.AddBus(provider => RabbitMqBus.ConfigureBusWebApi(builder.Configuration, provider));
 });
 builder.Services.AddMassTransitHostedService();
 
 #endregion
-
-#region Serilog
-string servicename = builder.Configuration.GetValue<string>("Otlp:ServiceName");
-string otlpENdPoint = builder.Configuration.GetValue<string>("Otlp:Endpoint");
-builder.Host.UseSerilog((hostingContext, loggerConfiguration) => loggerConfiguration
-    .ReadFrom.Configuration(hostingContext.Configuration)
-    .WriteTo.OpenTelemetry(options =>
-    {
-        options.Endpoint = $"{otlpENdPoint}/v1/logs";
-        options.Protocol = Serilog.Sinks.OpenTelemetry.OtlpProtocol.GrpcProtobuf;
-        options.ResourceAttributes = new Dictionary<string, object>
-        {
-            ["service.name"] = servicename
-        };
-    }));
-#endregion
+var serviceName = builder.Configuration.GetValue<string>("OTEL:ServiceName");
+string endPoint = builder.Configuration.GetValue<string>("OTEL:Endpoint");
 
 #region Opentelemetry
 Action<ResourceBuilder> appResourceBuilder =
 resource => resource
 .AddTelemetrySdk()
-.AddService(builder.Configuration.GetValue<string>("Otlp:ServiceName"));
+.AddService(serviceName: serviceName)
+.AddAttributes(new Dictionary<string, object>
+{
+    ["host.name"] = Environment.MachineName,
+    ["os.description"] = RuntimeInformation.OSDescription,
+    ["deployment.environment"] = builder.Environment.EnvironmentName.ToLowerInvariant(),
+}); ;
+
 
 builder.Services.AddOpenTelemetry()
     .ConfigureResource(appResourceBuilder)
@@ -60,13 +60,29 @@ builder.Services.AddOpenTelemetry()
         .AddMassTransitInstrumentation()
         .AddSource(DiagnosticHeaders.DefaultListenerName)
         .AddSource("APITracing")
-        //.AddConsoleExporter()
-        .AddOtlpExporter(options => options.Endpoint = new Uri(otlpENdPoint))
+                .AddOtlpExporter(options => options.Endpoint = new Uri(uriString: endPoint))
+
     )
     .WithMetrics(builder => builder
+        .AddMeter("System.Net.Http")
+        .AddMeter("Microsoft.AspNetCore.Hosting")
+        .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
+        .AddMeter("Microsoft.AspNetCore.Http.Connections")
+
         .AddRuntimeInstrumentation()
+        .AddHttpClientInstrumentation()
         .AddAspNetCoreInstrumentation()
-        .AddOtlpExporter(options => options.Endpoint = new Uri(otlpENdPoint))); 
+     .AddPrometheusExporter()
+        .AddOtlpExporter(options => options.Endpoint = new Uri(uriString: endPoint))); 
+
+
+builder.Logging.AddOpenTelemetry(options =>
+{
+    options.AddOtlpExporter(options => options.Endpoint = new Uri(uriString: endPoint));
+    options.IncludeFormattedMessage = true;
+    options.IncludeScopes = true;
+    options.ParseStateValues = true;
+});
 #endregion
 
 
@@ -93,6 +109,9 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
+app.UseHttpMetrics();
 app.MapControllers();
 
+app.UseMetricServer();
+app.UseOpenTelemetryPrometheusScrapingEndpoint();
 app.Run();
