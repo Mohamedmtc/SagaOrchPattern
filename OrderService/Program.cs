@@ -24,6 +24,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors();
+
+
 builder.Services.AddProblemDetails().AddExceptionHandler<GlobalExceptionHandler>();
 
 #region MassTransit
@@ -62,27 +64,27 @@ builder.Services.AddOpenTelemetry()
         .AddSource("APITracing")
                 .AddOtlpExporter(options => options.Endpoint = new Uri(uriString: endPoint))
 
-    )
-    .WithMetrics(builder => builder
-        .AddMeter("System.Net.Http")
-        .AddMeter("Microsoft.AspNetCore.Hosting")
-        .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
-        .AddMeter("Microsoft.AspNetCore.Http.Connections")
+    );
+    //.WithMetrics(builder => builder
+    //    .AddMeter("System.Net.Http")
+    //    .AddMeter("Microsoft.AspNetCore.Hosting")
+    //    .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
+    //    .AddMeter("Microsoft.AspNetCore.Http.Connections")
 
-        .AddRuntimeInstrumentation()
-        .AddHttpClientInstrumentation()
-        .AddAspNetCoreInstrumentation()
-     .AddPrometheusExporter()
-        .AddOtlpExporter(options => options.Endpoint = new Uri(uriString: endPoint))); 
+    //    .AddRuntimeInstrumentation()
+    //    .AddHttpClientInstrumentation()
+    //    .AddAspNetCoreInstrumentation()
+    // .AddPrometheusExporter()
+    //    .AddOtlpExporter(options => options.Endpoint = new Uri(uriString: endPoint))); 
 
 
-builder.Logging.AddOpenTelemetry(options =>
-{
-    options.AddOtlpExporter(options => options.Endpoint = new Uri(uriString: endPoint));
-    options.IncludeFormattedMessage = true;
-    options.IncludeScopes = true;
-    options.ParseStateValues = true;
-});
+//builder.Logging.AddOpenTelemetry(options =>
+//{
+//    options.AddOtlpExporter(options => options.Endpoint = new Uri(uriString: endPoint));
+//    options.IncludeFormattedMessage = true;
+//    options.IncludeScopes = true;
+//    options.ParseStateValues = true;
+//});
 #endregion
 
 
@@ -96,7 +98,9 @@ app.UseCors(builder =>
 });
 
 app.UseStatusCodePages();
+
 app.UseExceptionHandler();
+
 app.UseMiddleware<TraceIdMiddleware>();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -113,5 +117,5 @@ app.UseHttpMetrics();
 app.MapControllers();
 
 app.UseMetricServer();
-app.UseOpenTelemetryPrometheusScrapingEndpoint();
+//app.UseOpenTelemetryPrometheusScrapingEndpoint();
 app.Run();

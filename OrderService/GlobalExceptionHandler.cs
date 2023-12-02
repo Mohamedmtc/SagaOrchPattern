@@ -11,6 +11,7 @@ namespace OrderService
             Exception exception,
             CancellationToken cancellationToken)
         {
+
             var traceId = Activity.Current?.Id ?? httpContext.TraceIdentifier;
 
             logger.LogError(
@@ -19,26 +20,30 @@ namespace OrderService
                 Environment.MachineName,
                 traceId
             );
+
             httpContext.Response.Headers.Add("TraceId", traceId);
-            var (statusCode, title) = MapException(exception);
+
+
+            var (statusCode, title, errors) = MapException(exception);
 
             await Results.Problem(
                 title: title,
                 statusCode: statusCode,
                 extensions: new Dictionary<string, object?>
                 {
-                {"traceId",  traceId}
+                {"traceId",  traceId}, {"Error",errors }
+
                 }
             ).ExecuteAsync(httpContext);
 
             return true;
         }
-        private static (int StatusCode, string Title) MapException(Exception exception)
+        private static (int StatusCode, string Title, List<string> errorList) MapException(Exception exception)
         {
             return exception switch
             {
-                ArgumentOutOfRangeException => (StatusCodes.Status400BadRequest, exception.Message),
-                _ => (StatusCodes.Status500InternalServerError, "We made a mistake but we are on it!")
+                WebApiException => (StatusCodes.Status400BadRequest, exception.Message, (exception as WebApiException).Errors),
+                _ => (StatusCodes.Status500InternalServerError, "We made a mistake but we are on it!", null)
             };
         }
 

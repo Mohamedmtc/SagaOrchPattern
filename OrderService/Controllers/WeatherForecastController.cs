@@ -2,6 +2,7 @@ using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using SagaOrchPattern.Messages.Order.Event;
 using System.Diagnostics;
+using System.Text;
 
 namespace OrderService.Controllers
 {
@@ -52,7 +53,9 @@ namespace OrderService.Controllers
         {
             var id = Guid.NewGuid();
             var traceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
-            throw new Exception("atia error");
+
+
+            throw new WebApiException("atia error",new List<string> { "hamada","by7b","tata"});
 
         }
     }
